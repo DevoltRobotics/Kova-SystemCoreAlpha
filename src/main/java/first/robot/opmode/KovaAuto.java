@@ -4,17 +4,31 @@
 
 package first.robot.opmode;
 
+import org.wpilib.command3.Scheduler;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.opmode.Autonomous;
 import org.wpilib.opmode.PeriodicOpMode;
 import first.robot.Robot;
 
-@Autonomous(name = "My Auto", group = "Group 1")
-public class MyAuto extends PeriodicOpMode {
+@Autonomous(name = "Kova Auto", group = "Group 1")
+public class KovaAuto extends PeriodicOpMode {
   private final Robot robot;
 
   /** The Robot instance is passed into the opmode via the constructor. */
-  public MyAuto(Robot robot) {
+  public KovaAuto(Robot robot) {
     this.robot = robot;
+  }
+
+  @Override
+  public void start() {
+    robot.mecanumMechanism.setPose(new Pose2d());
+
+    Scheduler.getDefault().schedule(
+      robot.mecanumMechanism.driveToPointCmd(new Pose2d(0.5, 0, Rotation2d.fromDegrees(0)), 1)
+      .andThen(robot.mecanumMechanism.driveToPointCmd(new Pose2d(0, 0, Rotation2d.fromDegrees(180)), 1))
+      .withAutomaticName()
+    );
   }
 
   /*
@@ -25,6 +39,6 @@ public class MyAuto extends PeriodicOpMode {
    */
   @Override
   public void periodic() {
-    // Put custom auto code here
+    Scheduler.getDefault().run();
   }
 }

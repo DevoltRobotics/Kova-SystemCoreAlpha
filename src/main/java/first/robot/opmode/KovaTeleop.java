@@ -5,8 +5,10 @@
 package first.robot.opmode;
 
 import org.wpilib.command3.Scheduler;
+import org.wpilib.command3.Trigger;
 import org.wpilib.driverstation.DefaultUserControls;
 import org.wpilib.driverstation.Gamepad;
+import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.opmode.PeriodicOpMode;
 import org.wpilib.opmode.Teleop;
 import first.robot.Robot;
@@ -26,7 +28,16 @@ public class KovaTeleop extends PeriodicOpMode {
   @Override
   public void start() {
     Gamepad gamepad1 = controls.getGamepad(0);
-    Scheduler.getDefault().schedule(robot.mecanumSubsystem.driveCmd(gamepad1));
+    
+    Scheduler.getDefault().setDefaultCommand(robot.mecanumMechanism, 
+      robot.mecanumMechanism.driveCartesianCmd(gamepad1, true)
+    );
+
+    Trigger resetFieldCentricTrigger = new Trigger(() -> gamepad1.getDpadUpButton());
+
+    resetFieldCentricTrigger.onTrue(robot.mecanumMechanism.run(co -> {
+      robot.mecanumMechanism.setPose(new Pose2d());
+    }).named("ResetPoseCmd"));
   }
 
   @Override

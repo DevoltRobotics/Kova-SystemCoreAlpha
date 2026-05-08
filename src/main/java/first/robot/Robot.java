@@ -7,9 +7,12 @@ package first.robot;
 import org.wpilib.driverstation.DefaultUserControls;
 import org.wpilib.driverstation.UserControlsInstance;
 import org.wpilib.framework.OpModeRobot;
+import org.wpilib.hardware.bus.I2C;
 import org.wpilib.hardware.expansionhub.ExpansionHubMotor;
 
-import first.robot.subsystem.MecanumSubsystem;
+import first.robot.driver.GoBildaPinpointDriver;
+import first.robot.driver.GoBildaPinpointDriver.GoBildaOdometryPods;
+import first.robot.mechanism.MecanumMechanism;
 
 /**
  * The methods in this class are called automatically as described in the OpModeRobot documentation.
@@ -28,10 +31,11 @@ public class Robot extends OpModeRobot {
   ExpansionHubMotor frontRight = new ExpansionHubMotor(0, 2);
   ExpansionHubMotor rearRight = new ExpansionHubMotor(0, 3);
 
+  GoBildaPinpointDriver pinpoint = new GoBildaPinpointDriver(I2C.Port.PORT_0);
+
   // SUBSYSTEMS
 
-  public final MecanumSubsystem mecanumSubsystem = new MecanumSubsystem(frontLeft, rearLeft, frontRight, rearRight);
-
+  public final MecanumMechanism mecanumMechanism = new MecanumMechanism(frontLeft, rearLeft, frontRight, rearRight, pinpoint);
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -40,6 +44,14 @@ public class Robot extends OpModeRobot {
   public Robot() {
     frontLeft.setReversed(true);
     rearLeft.setReversed(true);
+    
+    frontLeft.setFloatOn0(false);
+    rearLeft.setFloatOn0(false);
+    frontRight.setFloatOn0(false);
+    rearRight.setFloatOn0(false);
+    
+    pinpoint.setEncoderResolution(GoBildaOdometryPods.SWINGARM_POD);
+    pinpoint.setOffsets(100, 20);
   }
 
   /** This function is called exactly once when the DS first connects. */
